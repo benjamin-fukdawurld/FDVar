@@ -1,0 +1,70 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "create build directory",
+      "type": "shell",
+      "command": "mkdir",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "args": [
+        "-p",
+        "build"
+      ]
+    },
+    {
+      "label": "configure build",
+      "type": "shell",
+      "command": "cmake",
+      "options": {
+        "cwd": "${workspaceFolder}/build"
+      },
+      "args": [
+        "-DCMAKE_C_COMPILER=clang-12",
+        "-DCMAKE_CXX_COMPILER=clang++-12",
+        "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+        "-DBUILD_TESTS=ON",
+        "-DFDVAR_GTEST_DIR:PATH=${workspaceRoot}/../../FDFramework/thirdparty/install",
+        ".."
+      ],
+      "dependsOn": [
+        "create build directory"
+      ]
+    },
+    {
+      "label": "build FDVar",
+      "type": "shell",
+      "command": "cmake",
+      "options": {
+        "cwd": "${workspaceFolder}/build"
+      },
+      "args": [
+        "--build",
+        ".",
+        "-j12"
+      ],
+      "dependsOn": [
+        "configure build"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "install FDVar",
+      "type": "shell",
+      "command": "make",
+      "options": {
+        "cwd": "${workspaceFolder}/build/FDVar"
+      },
+      "args": [
+        "install"
+      ],
+      "dependsOn": [
+        "build FDVar"
+      ]
+    }
+  ]
+}

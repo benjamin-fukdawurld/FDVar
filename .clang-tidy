@@ -1,0 +1,287 @@
+---
+Checks:          'clang-diagnostic-*,clang-analyzer-*,clang-diagnostic-*,clang-analyzer-*,-*,clang-analyzer-*,bugprone-*,concurrency-*,cppcoreguidelines-*,-cppcoreguidelines-avoid-non-const-global-variables,-cppcoreguidelines-pro-type-static-cast-downcast,performance-*,portability-*,readability-*'
+WarningsAsErrors: ''
+HeaderFilterRegex: ''
+AnalyzeTemporaryDtors: false
+FormatStyle:     file
+User:            bzamour
+CheckOptions:
+  - key:             modernize-replace-auto-ptr.IncludeStyle
+    value:           llvm
+  - key:             performance-move-const-arg.CheckTriviallyCopyableMove
+    value:           'true'
+  - key:             cppcoreguidelines-owning-memory.LegacyResourceConsumers
+    value:           '::free;::realloc;::freopen;::fclose'
+  - key:             cppcoreguidelines-no-malloc.Reallocations
+    value:           '::realloc'
+  - key:             readability-function-size.VariableThreshold
+    value:           '4294967295'
+  - key:             bugprone-narrowing-conversions.PedanticMode
+    value:           'false'
+  - key:             bugprone-unused-return-value.CheckedFunctions
+    value:           '::std::async;::std::launder;::std::remove;::std::remove_if;::std::unique;::std::unique_ptr::release;::std::basic_string::empty;::std::vector::empty;::std::back_inserter;::std::distance;::std::find;::std::find_if;::std::inserter;::std::lower_bound;::std::make_pair;::std::map::count;::std::map::find;::std::map::lower_bound;::std::multimap::equal_range;::std::multimap::upper_bound;::std::set::count;::std::set::find;::std::setfill;::std::setprecision;::std::setw;::std::upper_bound;::std::vector::at;::bsearch;::ferror;::feof;::isalnum;::isalpha;::isblank;::iscntrl;::isdigit;::isgraph;::islower;::isprint;::ispunct;::isspace;::isupper;::iswalnum;::iswprint;::iswspace;::isxdigit;::memchr;::memcmp;::strcmp;::strcoll;::strncmp;::strpbrk;::strrchr;::strspn;::strstr;::wcscmp;::access;::bind;::connect;::difftime;::dlsym;::fnmatch;::getaddrinfo;::getopt;::htonl;::htons;::iconv_open;::inet_addr;::isascii;::isatty;::mmap;::newlocale;::openat;::pathconf;::pthread_equal;::pthread_getspecific;::pthread_mutex_trylock;::readdir;::readlink;::recvmsg;::regexec;::scandir;::semget;::setjmp;::shm_open;::shmget;::sigismember;::strcasecmp;::strsignal;::ttyname'
+  - key:             cert-dcl16-c.NewSuffixes
+    value:           'L;LL;LU;LLU'
+  - key:             readability-static-accessed-through-instance.NameSpecifierNestingThreshold
+    value:           '3'
+  - key:             cppcoreguidelines-macro-usage.CheckCapsOnly
+    value:           'false'
+  - key:             bugprone-narrowing-conversions.WarnOnFloatingPointNarrowingConversion
+    value:           'true'
+  - key:             readability-inconsistent-declaration-parameter-name.Strict
+    value:           'false'
+  - key:             bugprone-reserved-identifier.Invert
+    value:           'false'
+  - key:             readability-identifier-naming.GetConfigPerFile
+    value:           'true'
+  - key:             readability-function-size.NestingThreshold
+    value:           '4294967295'
+  - key:             readability-function-size.ParameterThreshold
+    value:           '4294967295'
+  - key:             cert-str34-c.DiagnoseSignedUnsignedCharComparisons
+    value:           '0'
+  - key:             bugprone-suspicious-string-compare.WarnOnLogicalNotComparison
+    value:           'false'
+  - key:             cppcoreguidelines-explicit-virtual-functions.AllowOverrideAndFinal
+    value:           'false'
+  - key:             readability-redundant-smartptr-get.IgnoreMacros
+    value:           'true'
+  - key:             readability-identifier-naming.AggressiveDependentMemberLookup
+    value:           'false'
+  - key:             bugprone-suspicious-string-compare.WarnOnImplicitComparison
+    value:           'true'
+  - key:             bugprone-argument-comment.CommentNullPtrs
+    value:           '0'
+  - key:             cppcoreguidelines-owning-memory.LegacyResourceProducers
+    value:           '::malloc;::aligned_alloc;::realloc;::calloc;::fopen;::freopen;::tmpfile'
+  - key:             cppcoreguidelines-narrowing-conversions.WarnOnFloatingPointNarrowingConversion
+    value:           'true'
+  - key:             bugprone-argument-comment.StrictMode
+    value:           '0'
+  - key:             cppcoreguidelines-init-variables.IncludeStyle
+    value:           llvm
+  - key:             bugprone-unhandled-self-assignment.WarnOnlyIfThisHasSuspiciousField
+    value:           'true'
+  - key:             google-readability-namespace-comments.ShortNamespaceLines
+    value:           '10'
+  - key:             bugprone-suspicious-string-compare.StringCompareLikeFunctions
+    value:           ''
+  - key:             performance-move-constructor-init.IncludeStyle
+    value:           llvm
+  - key:             cppcoreguidelines-prefer-member-initializer.UseAssignment
+    value:           'false'
+  - key:             performance-type-promotion-in-math-fn.IncludeStyle
+    value:           llvm
+  - key:             cppcoreguidelines-explicit-virtual-functions.FinalSpelling
+    value:           final
+  - key:             modernize-loop-convert.NamingStyle
+    value:           CamelCase
+  - key:             bugprone-suspicious-include.ImplementationFileExtensions
+    value:           'c;cc;cpp;cxx'
+  - key:             cppcoreguidelines-pro-type-member-init.UseAssignment
+    value:           'false'
+  - key:             bugprone-suspicious-missing-comma.SizeThreshold
+    value:           '5'
+  - key:             bugprone-suspicious-include.HeaderFileExtensions
+    value:           ';h;hh;hpp;hxx'
+  - key:             performance-for-range-copy.WarnOnAllAutoCopies
+    value:           'false'
+  - key:             bugprone-argument-comment.CommentIntegerLiterals
+    value:           '0'
+  - key:             performance-no-automatic-move.AllowedTypes
+    value:           ''
+  - key:             bugprone-argument-comment.CommentCharacterLiterals
+    value:           '0'
+  - key:             readability-inconsistent-declaration-parameter-name.IgnoreMacros
+    value:           'true'
+  - key:             readability-identifier-naming.IgnoreFailedSplit
+    value:           'false'
+  - key:             modernize-pass-by-value.IncludeStyle
+    value:           llvm
+  - key:             bugprone-sizeof-expression.WarnOnSizeOfThis
+    value:           'true'
+  - key:             readability-qualified-auto.AddConstToQualified
+    value:           'true'
+  - key:             bugprone-too-small-loop-variable.MagnitudeBitsUpperLimit
+    value:           '16'
+  - key:             cppcoreguidelines-explicit-virtual-functions.OverrideSpelling
+    value:           override
+  - key:             bugprone-string-constructor.WarnOnLargeLength
+    value:           'true'
+  - key:             readability-simplify-boolean-expr.ChainedConditionalReturn
+    value:           'false'
+  - key:             readability-else-after-return.WarnOnConditionVariables
+    value:           'true'
+  - key:             readability-uppercase-literal-suffix.IgnoreMacros
+    value:           'true'
+  - key:             modernize-use-nullptr.NullMacros
+    value:           'NULL'
+  - key:             bugprone-dynamic-static-initializers.HeaderFileExtensions
+    value:           ';h;hh;hpp;hxx'
+  - key:             bugprone-suspicious-enum-usage.StrictMode
+    value:           'false'
+  - key:             performance-unnecessary-copy-initialization.AllowedTypes
+    value:           ''
+  - key:             bugprone-argument-comment.CommentFloatLiterals
+    value:           '0'
+  - key:             bugprone-suspicious-missing-comma.MaxConcatenatedTokens
+    value:           '5'
+  - key:             cppcoreguidelines-macro-usage.AllowedRegexp
+    value:           '^DEBUG_*'
+  - key:             cppcoreguidelines-narrowing-conversions.PedanticMode
+    value:           'false'
+  - key:             bugprone-not-null-terminated-result.WantToUseSafeFunctions
+    value:           'true'
+  - key:             bugprone-string-constructor.LargeLengthThreshold
+    value:           '8388608'
+  - key:             readability-simplify-boolean-expr.ChainedConditionalAssignment
+    value:           'false'
+  - key:             cppcoreguidelines-avoid-magic-numbers.IgnoreAllFloatingPointValues
+    value:           'false'
+  - key:             cppcoreguidelines-special-member-functions.AllowMissingMoveFunctions
+    value:           'false'
+  - key:             cert-oop54-cpp.WarnOnlyIfThisHasSuspiciousField
+    value:           '0'
+  - key:             bugprone-exception-escape.FunctionsThatShouldNotThrow
+    value:           ''
+  - key:             performance-inefficient-vector-operation.EnableProto
+    value:           'false'
+  - key:             bugprone-argument-comment.CommentStringLiterals
+    value:           '0'
+  - key:             modernize-loop-convert.MaxCopySize
+    value:           '16'
+  - key:             readability-function-size.LineThreshold
+    value:           '4294967295'
+  - key:             bugprone-signed-char-misuse.CharTypdefsToIgnore
+    value:           ''
+  - key:             portability-simd-intrinsics.Suggest
+    value:           'false'
+  - key:             cppcoreguidelines-pro-bounds-constant-array-index.GslHeader
+    value:           ''
+  - key:             cppcoreguidelines-explicit-virtual-functions.IgnoreDestructors
+    value:           'true'
+  - key:             performance-for-range-copy.AllowedTypes
+    value:           ''
+  - key:             bugprone-sizeof-expression.WarnOnSizeOfConstant
+    value:           'true'
+  - key:             readability-redundant-string-init.StringNames
+    value:           '::std::basic_string'
+  - key:             readability-magic-numbers.IgnoreBitFieldsWidths
+    value:           'true'
+  - key:             bugprone-argument-comment.CommentBoolLiterals
+    value:           '0'
+  - key:             readability-braces-around-statements.ShortStatementLines
+    value:           '0'
+  - key:             bugprone-argument-comment.CommentUserDefinedLiterals
+    value:           '0'
+  - key:             readability-magic-numbers.IgnoredFloatingPointValues
+    value:           '1.0;100.0;'
+  - key:             performance-inefficient-string-concatenation.StrictMode
+    value:           'false'
+  - key:             readability-implicit-bool-conversion.AllowPointerConditions
+    value:           'false'
+  - key:             readability-redundant-declaration.IgnoreMacros
+    value:           'true'
+  - key:             google-readability-braces-around-statements.ShortStatementLines
+    value:           '1'
+  - key:             bugprone-reserved-identifier.AllowedIdentifiers
+    value:           ''
+  - key:             cppcoreguidelines-pro-type-member-init.IgnoreArrays
+    value:           'false'
+  - key:             readability-else-after-return.WarnOnUnfixable
+    value:           'true'
+  - key:             portability-restrict-system-includes.Includes
+    value:           '*'
+  - key:             cppcoreguidelines-avoid-magic-numbers.IgnoredFloatingPointValues
+    value:           '1.0;100.0;'
+  - key:             cppcoreguidelines-macro-usage.IgnoreCommandLineMacros
+    value:           'true'
+  - key:             cppcoreguidelines-pro-bounds-constant-array-index.IncludeStyle
+    value:           llvm
+  - key:             readability-magic-numbers.IgnoreAllFloatingPointValues
+    value:           'false'
+  - key:             bugprone-misplaced-widening-cast.CheckImplicitCasts
+    value:           'false'
+  - key:             readability-uppercase-literal-suffix.NewSuffixes
+    value:           ''
+  - key:             modernize-loop-convert.MinConfidence
+    value:           reasonable
+  - key:             performance-unnecessary-value-param.AllowedTypes
+    value:           ''
+  - key:             cppcoreguidelines-avoid-magic-numbers.IgnorePowersOf2IntegerValues
+    value:           'false'
+  - key:             cppcoreguidelines-special-member-functions.AllowMissingMoveFunctionsWhenCopyIsDeleted
+    value:           'false'
+  - key:             cppcoreguidelines-avoid-magic-numbers.IgnoredIntegerValues
+    value:           '1;2;3;4;'
+  - key:             google-readability-namespace-comments.SpacesBeforeComments
+    value:           '2'
+  - key:             cppcoreguidelines-avoid-magic-numbers.IgnoreBitFieldsWidths
+    value:           'true'
+  - key:             cppcoreguidelines-non-private-member-variables-in-classes.IgnoreClassesWithAllMemberVariablesBeingPublic
+    value:           'true'
+  - key:             bugprone-argument-comment.IgnoreSingleArgument
+    value:           '0'
+  - key:             cppcoreguidelines-non-private-member-variables-in-classes.IgnorePublicMemberVariables
+    value:           'false'
+  - key:             cppcoreguidelines-no-malloc.Allocations
+    value:           '::malloc;::calloc'
+  - key:             bugprone-sizeof-expression.WarnOnSizeOfIntegerExpression
+    value:           'false'
+  - key:             readability-function-cognitive-complexity.Threshold
+    value:           '25'
+  - key:             performance-faster-string-find.StringLikeClasses
+    value:           '::std::basic_string;::std::basic_string_view'
+  - key:             bugprone-suspicious-missing-comma.RatioThreshold
+    value:           '0.200000'
+  - key:             bugprone-assert-side-effect.CheckFunctionCalls
+    value:           'false'
+  - key:             bugprone-assert-side-effect.AssertMacros
+    value:           assert
+  - key:             bugprone-signed-char-misuse.DiagnoseSignedUnsignedCharComparisons
+    value:           'true'
+  - key:             readability-function-size.BranchThreshold
+    value:           '4294967295'
+  - key:             bugprone-exception-escape.IgnoredExceptions
+    value:           ''
+  - key:             readability-function-size.StatementThreshold
+    value:           '800'
+  - key:             llvm-qualified-auto.AddConstToQualified
+    value:           '0'
+  - key:             readability-identifier-naming.IgnoreMainLikeFunctions
+    value:           'false'
+  - key:             readability-implicit-bool-conversion.AllowIntegerConditions
+    value:           'false'
+  - key:             cppcoreguidelines-init-variables.MathHeader
+    value:           '<math.h>'
+  - key:             google-readability-function-size.StatementThreshold
+    value:           '800'
+  - key:             llvm-else-after-return.WarnOnConditionVariables
+    value:           '0'
+  - key:             bugprone-sizeof-expression.WarnOnSizeOfCompareToConstant
+    value:           'true'
+  - key:             bugprone-reserved-identifier.AggressiveDependentMemberLookup
+    value:           'false'
+  - key:             cppcoreguidelines-special-member-functions.AllowSoleDefaultDtor
+    value:           'false'
+  - key:             cppcoreguidelines-no-malloc.Deallocations
+    value:           '::free'
+  - key:             performance-inefficient-vector-operation.VectorLikeClasses
+    value:           '::std::vector'
+  - key:             readability-magic-numbers.IgnoredIntegerValues
+    value:           '1;2;3;4;'
+  - key:             bugprone-dangling-handle.HandleClasses
+    value:           'std::basic_string_view;std::experimental::basic_string_view'
+  - key:             readability-magic-numbers.IgnorePowersOf2IntegerValues
+    value:           'false'
+  - key:             portability-simd-intrinsics.Std
+    value:           ''
+  - key:             performance-unnecessary-value-param.IncludeStyle
+    value:           llvm
+  - key:             readability-redundant-member-init.IgnoreBaseInCopyConstructors
+    value:           'false'
+  - key:             llvm-else-after-return.WarnOnUnfixable
+    value:           '0'
+  - key:             readability-simplify-subscript-expr.Types
+    value:           '::std::basic_string;::std::basic_string_view;::std::vector;::std::array'
+...
