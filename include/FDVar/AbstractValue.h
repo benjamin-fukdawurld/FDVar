@@ -3,19 +3,10 @@
 
 #include <FDVar/ValueType.h>
 #include <memory>
+#include <optional>
 
 namespace FDVar
 {
-    template<typename T, typename U = void>
-    struct is_AbstractValue_constructible
-    {
-        constexpr static bool value = false;
-    };
-
-    template<typename T>
-    inline constexpr bool is_AbstractValue_constructible_v =
-      is_AbstractValue_constructible<T>::value;
-
     class AbstractValue
     {
       public:
@@ -34,6 +25,16 @@ namespace FDVar
         virtual ValueType getValueType() const = 0;
         virtual bool isType(ValueType type) const { return type == getValueType(); }
     };
+
+    template<typename T, typename U = void>
+    struct is_AbstractValue_constructible
+    {
+        constexpr static bool value = false;
+    };
+
+    template<typename T>
+    inline constexpr bool is_AbstractValue_constructible_v =
+      is_AbstractValue_constructible<T>::value;
 } // namespace FDVar
 
 #endif // FDVAR_ABSTRACTVALUE_H

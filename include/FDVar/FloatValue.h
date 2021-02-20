@@ -222,20 +222,26 @@ namespace FDVar
     struct is_AbstractValue_constructible<T, std::enable_if_t<std::is_floating_point_v<T>>>
     {
         constexpr static bool value = true;
-
-        static AbstractValue::Ptr toValue(const T &value)
-        {
-            return AbstractValue::Ptr(new FloatValue(value));
-        }
-
-        static std::optional<T> fromValue(const AbstractValue::Ptr &value)
-        {
-            if(value->isType(ValueType::Float))
-                return static_cast<T>(static_cast<const FloatValue &>(*value));
-
-            return std::nullopt;
-        }
     };
+
+    template<typename T>
+    AbstractValue::Ptr toAbstractValuePtr(
+      const std::enable_if_t<std::is_floating_point_v<T>, T> &value)
+    {
+        return AbstractValue::Ptr(new FloatValue(value));
+    }
+
+    template<typename T>
+    std::optional<std::enable_if_t<std::is_floating_point_v<T>, T>> fromAbstractValuePtr(
+      const AbstractValue::Ptr &value)
+    {
+        if(value->isType(ValueType::Float))
+        {
+            return static_cast<T>(static_cast<const FloatValue &>(*value));
+        }
+
+        return std::nullopt;
+    }
 } // namespace FDVar
 
 template<typename T>

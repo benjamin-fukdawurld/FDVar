@@ -86,6 +86,42 @@ namespace FDVar
 
         void unset(StringViewType key) override { m_values.erase(StringType(key)); }
     };
+
+    template<>
+    struct is_AbstractValue_constructible<ObjectValue::ObjectType>
+    {
+        constexpr static bool value = true;
+    };
+
+    template<typename T>
+    AbstractValue::Ptr toAbstractValuePtr(
+      const std::enable_if_t<std::is_same_v<ObjectValue::ObjectType, T>, T> &value)
+    {
+        return AbstractValue::Ptr(new ObjectValue(value));
+    }
+
+    template<typename T>
+    std::optional<std::enable_if_t<std::is_same_v<ObjectValue::ObjectType, T>, T>>
+      fromAbstractValuePtr(const AbstractValue::Ptr &value)
+    {
+        if(value->isType(ValueType::Object))
+        {
+            T result;
+            const auto &obj = static_cast<const AbstractObjectValue &>(*value);
+            AbstractValue::Ptr keys = obj.keys();
+            const auto &arr = static_cast<const AbstractArrayValue &>(*keys);
+            for(ArrayValue::SizeType i = 0, imax = arr.size(); i < imax; ++i)
+            {
+                const auto &key = static_cast<const StringValue::StringType &>(
+                  static_cast<const StringValue &>(*(arr[i])));
+                result[key] = obj.get(key);
+            }
+
+            return result;
+        }
+
+        return std::nullopt;
+    }
 } // namespace FDVar
 
 #endif // FDVAR_OBJECTVALUE_H

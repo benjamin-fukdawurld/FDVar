@@ -45,6 +45,61 @@ namespace FDVar
         AbstractValue::Ptr removeAt(SizeType pos) override;
         void clear() override { m_values.clear(); }
     };
+
+    void ArrayValue::insert(AbstractValue::Ptr value, ArrayValue::SizeType pos)
+    {
+        auto where = m_values.begin();
+        std::advance(where, pos);
+        m_values.insert(where, std::move(value));
+    }
+
+    AbstractValue::Ptr ArrayValue::removeAt(ArrayValue::SizeType pos)
+    {
+        AbstractValue::Ptr result = m_values[pos];
+        auto where = m_values.begin();
+        std::advance(where, pos);
+        m_values.erase(where);
+        return result;
+    }
+
+    AbstractValue::Ptr ArrayValue::pop()
+    {
+        FDVar::AbstractValue::Ptr result = m_values.back();
+        m_values.pop_back();
+        return result;
+    }
+
+    template<>
+    struct is_AbstractValue_constructible<ArrayValue::ArrayType>
+    {
+        constexpr static bool value = true;
+    };
+
+    template<typename T>
+    AbstractValue::Ptr toAbstractValuePtr(
+      const std::enable_if_t<std::is_same_v<ArrayValue::ArrayType, T>, T> &value)
+    {
+        return AbstractValue::Ptr(new ArrayValue(value));
+    }
+
+    template<typename T>
+    std::optional<std::enable_if_t<std::is_same_v<ArrayValue::ArrayType, T>, T>>
+      fromAbstractValuePtr(const AbstractValue::Ptr &value)
+    {
+        if(value->isType(ValueType::Array))
+        {
+            T result;
+            const auto &arr = static_cast<const AbstractArrayValue &>(*value);
+            for(ArrayValue::SizeType i = 0, imax = arr.size(); i < imax; ++i)
+            {
+                result.emplace_back(arr[i]);
+            }
+
+            return result;
+        }
+
+        return std::nullopt;
+    }
 } // namespace FDVar
 
 

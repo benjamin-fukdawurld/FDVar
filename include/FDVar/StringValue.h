@@ -42,6 +42,7 @@ namespace FDVar
         StringValue &operator=(const StringValue &) = default;
 
         explicit operator const StringType &() const { return m_value; }
+        explicit operator StringViewType() const { return m_value; }
 
         StringValue &operator=(StringViewType value)
         {
@@ -55,7 +56,7 @@ namespace FDVar
 
         bool operator!=(const StringValue &value) const { return m_value != value.m_value; }
 
-        bool operator!=(StringType value) const { return m_value != value; }
+        bool operator!=(const StringType &value) const { return m_value != value; }
 
         StringValue &operator+=(StringViewType value)
         {
@@ -88,21 +89,51 @@ namespace FDVar
     struct is_AbstractValue_constructible<StringValue::StringType>
     {
         constexpr static bool value = true;
-
-        static AbstractValue::Ptr toValue(const StringValue::StringType &value)
-        {
-            return AbstractValue::Ptr(new StringValue(value));
-        }
-
-        static std::optional<StringValue::StringType> fromValue(const AbstractValue::Ptr &value)
-        {
-            if(value->isType(ValueType::String))
-                return static_cast<StringValue::StringType>(
-                  static_cast<const StringValue &>(*value));
-
-            return std::nullopt;
-        }
     };
+
+    template<typename T>
+    AbstractValue::Ptr toAbstractValuePtr(
+      const std::enable_if_t<std::is_same_v<StringValue::StringType, T>, T> &value)
+    {
+        return AbstractValue::Ptr(new StringValue(value));
+    }
+
+    template<typename T>
+    std::optional<std::enable_if_t<std::is_same_v<StringValue::StringType, T>, T>>
+      fromAbstractValuePtr(const AbstractValue::Ptr &value)
+    {
+        if(value->isType(ValueType::String))
+        {
+            return static_cast<T>(static_cast<const StringValue &>(*value));
+        }
+
+        return std::nullopt;
+    }
+
+    template<>
+    struct is_AbstractValue_constructible<StringValue::StringViewType>
+    {
+        constexpr static bool value = true;
+    };
+
+    template<typename T>
+    AbstractValue::Ptr toAbstractValuePtr(
+      const std::enable_if_t<std::is_same_v<StringValue::StringViewType, T>, T> &value)
+    {
+        return AbstractValue::Ptr(new StringValue(value));
+    }
+
+    template<typename T>
+    std::optional<std::enable_if_t<std::is_same_v<StringValue::StringViewType, T>, T>>
+      fromAbstractValuePtr(const AbstractValue::Ptr &value)
+    {
+        if(value->isType(ValueType::String))
+        {
+            return static_cast<T>(static_cast<const StringValue &>(*value));
+        }
+
+        return std::nullopt;
+    }
 } // namespace FDVar
 
 inline bool operator==(const FDVar::StringValue::StringType &value, const FDVar::StringValue &other)

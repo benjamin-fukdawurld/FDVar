@@ -71,20 +71,26 @@ namespace FDVar
     struct is_AbstractValue_constructible<bool>
     {
         constexpr static bool value = true;
-
-        static AbstractValue::Ptr toValue(bool value)
-        {
-            return AbstractValue::Ptr(new BoolValue(value));
-        }
-
-        static std::optional<bool> fromValue(const AbstractValue::Ptr &value)
-        {
-            if(value->isType(ValueType::Boolean))
-                return static_cast<bool>(static_cast<const BoolValue &>(*value));
-
-            return std::nullopt;
-        }
     };
+
+    template<typename T>
+    AbstractValue::Ptr toAbstractValuePtr(std::enable_if_t<std::is_same_v<bool, T>, T> value)
+    {
+        return AbstractValue::Ptr(new BoolValue(value));
+    }
+
+    template<typename T>
+    std::optional<std::enable_if_t<std::is_same_v<bool, T>, T>> fromAbstractValuePtr(
+      const AbstractValue::Ptr &value)
+    {
+        if(value->isType(ValueType::Boolean))
+        {
+            return static_cast<T>(static_cast<const BoolValue &>(*value));
+        }
+
+        return std::nullopt;
+    }
+
 } // namespace FDVar
 
 inline bool operator==(bool a, const FDVar::BoolValue &b) { return b == a; }

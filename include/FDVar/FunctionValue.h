@@ -54,6 +54,31 @@ namespace FDVar
             return m_value(std::move(args));
         }
     };
+
+    template<>
+    struct is_AbstractValue_constructible<FunctionValue::FunctionType>
+    {
+        constexpr static bool value = true;
+    };
+
+    template<typename T>
+    AbstractValue::Ptr toAbstractValuePtr(
+      const std::enable_if_t<std::is_same_v<FunctionValue::FunctionType, T>, T> &value)
+    {
+        return AbstractValue::Ptr(new FunctionValue(value));
+    }
+
+    template<typename T>
+    std::optional<std::enable_if_t<std::is_same_v<FunctionValue::FunctionType, T>, T>>
+      fromAbstractValuePtr(const AbstractValue::Ptr &value)
+    {
+        if(value->isType(ValueType::Function))
+        {
+            return static_cast<T>(static_cast<const FunctionValue &>(*value));
+        }
+
+        return std::nullopt;
+    }
 } // namespace FDVar
 
 #endif // FDVAR_FUNCTIONVALUE_H
