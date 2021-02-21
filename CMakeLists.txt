@@ -2,9 +2,9 @@ cmake_minimum_required(VERSION 3.10)
 
 project("FDVar" VERSION 0.1)
 
-configure_file(include/FDVar/FDVarConfig.h.in FDVarConfig.h)
+configure_file(FDVarConfig.h.in ${CMAKE_SOURCE_DIR}/include/FDVar/FDVarConfig.h)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -Wextra")
 
@@ -19,6 +19,7 @@ set(HEADER_FILES
     include/FDVar/ArrayValue.h
     include/FDVar/BoolValue.h
     include/FDVar/DynamicVariable_fwd.h
+    include/FDVar/DynamicVariable_ctors.h
     include/FDVar/DynamicVariable.h
     include/FDVar/FloatValue.h
     include/FDVar/FunctionValue.h
@@ -30,7 +31,6 @@ set(HEADER_FILES
 
 set(SRC_FILES
     src/DynamicVariable.cpp
-    src/ArrayValue.cpp
 )
 
 if(FDVAR_BUILD_STATIC)

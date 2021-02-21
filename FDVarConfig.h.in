@@ -1,0 +1,9 @@
+#ifndef FDVAR_FDVARCONFIG_H
+#define FDVAR_FDVARCONFIG_H
+
+// clang-format off
+constexpr int FDVar_VERSION_MAJOR = @FDVar_VERSION_MAJOR@;
+constexpr int FDVar_VERSION_MINOR = @FDVar_VERSION_MINOR@;
+// clang-format on
+
+#endif // FDVAR_FDVARCONFIG_H
