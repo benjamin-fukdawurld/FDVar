@@ -43,7 +43,12 @@ DynamicVariable::DynamicVariable(ValueType type)
     }
 }
 
-DynamicVariable::DynamicVariable(const DynamicVariable &other)
+DynamicVariable::DynamicVariable(const DynamicVariable &other) : DynamicVariable()
+{
+    *this = other;
+}
+
+DynamicVariable &DynamicVariable::operator=(const DynamicVariable &other)
 {
     switch(other.getValueType())
     {
@@ -67,6 +72,8 @@ DynamicVariable::DynamicVariable(const DynamicVariable &other)
             m_value = other.m_value;
             break;
     }
+
+    return *this;
 }
 
 DynamicVariable::DynamicVariable(const AbstractValue::Ptr &value) : m_value(value) {}
@@ -119,36 +126,6 @@ DynamicVariable::operator const ArrayType &() const
     }
 
     return static_cast<const ArrayType &>(static_cast<const ArrayValue &>(toArray()));
-}
-
-DynamicVariable::operator StringType() const
-{
-    if(!isType(ValueType::String))
-    {
-        throw generateCastException(__func__);
-    }
-
-    return static_cast<StringType>(toString());
-}
-
-DynamicVariable::operator ArrayType() const
-{
-    if(!isType(ValueType::Array))
-    {
-        throw generateCastException(__func__);
-    }
-
-    return static_cast<ArrayType>(static_cast<const ArrayValue &>(toArray()));
-}
-
-DynamicVariable::operator ObjectType() const
-{
-    if(!isType(ValueType::Object))
-    {
-        throw generateCastException(__func__);
-    }
-
-    return static_cast<ObjectType>(static_cast<const ObjectValue &>(toObject()));
 }
 
 DynamicVariable::operator const ObjectType &() const
@@ -541,6 +518,20 @@ DynamicVariable DynamicVariable::operator[](DynamicVariable::SizeType pos)
     throw generateCastException(__func__);
 }
 
+DynamicVariable DynamicVariable::operator[](DynamicVariable::SizeType pos) const
+{
+    if(isType(ValueType::String))
+    {
+        return DynamicVariable(StringType(1, toString()[pos]));
+    }
+
+    if(isType(ValueType::Array))
+    {
+        return DynamicVariable(toArray()[pos]);
+    }
+
+    throw generateCastException(__func__);
+}
 
 DynamicVariable DynamicVariable::operator[](StringViewType member)
 {
@@ -552,7 +543,48 @@ DynamicVariable DynamicVariable::operator[](StringViewType member)
     return toObject()[member];
 }
 
-DynamicVariable DynamicVariable::keys()
+DynamicVariable DynamicVariable::operator[](StringViewType member) const
+{
+    if(!isType(ValueType::Object))
+    {
+        throw generateCastException(__func__);
+    }
+
+    return toObject()[member];
+}
+
+
+DynamicVariable DynamicVariable::operator[](const DynamicVariable &var)
+{
+    if(var.isType(ValueType::Integer))
+    {
+        return this->operator[](static_cast<DynamicVariable::SizeType>(var));
+    }
+
+    if(var.isType(ValueType::String))
+    {
+        return this->operator[](static_cast<const DynamicVariable::StringType &>(var));
+    }
+
+    throw var.generateCastException(std::string(__func__) + "(as parameter)");
+}
+
+DynamicVariable DynamicVariable::operator[](const DynamicVariable &var) const
+{
+    if(var.isType(ValueType::Integer))
+    {
+        return this->operator[](static_cast<DynamicVariable::SizeType>(var));
+    }
+
+    if(var.isType(ValueType::String))
+    {
+        return this->operator[](static_cast<const DynamicVariable::StringType &>(var));
+    }
+
+    throw var.generateCastException(std::string(__func__) + "(as parameter)");
+}
+
+DynamicVariable DynamicVariable::keys() const
 {
     if(!isType(ValueType::Object))
     {

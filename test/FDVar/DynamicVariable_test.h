@@ -67,6 +67,15 @@ TEST(DynamicVariable_test, test_constructors)
         }
     }
 
+    /*{
+        FDVar::DynamicVariable value(
+          std::vector<DynamicVariable> { 0_var, 1_var, 2_var, 3_var, 4_var, 5_var });
+        for(FDVar::DynamicVariable::SizeType i = 0, imax = value.size(); i != imax; ++i)
+        {
+            ASSERT_EQ(value[i], i);
+        }
+    }*/
+
     {
         FDVar::DynamicVariable value { { "i", 0_var }, { "j", 1_var }, { "k", 2_var } };
         ASSERT_EQ(value["i"], 0);
@@ -460,7 +469,7 @@ TEST(DynamicVariable_test, test_string_operators)
 TEST(DynamicVariable_test, test_array_operators)
 {
     {
-        ASSERT_TRUE(static_cast<FDVar::DynamicVariable::ArrayType>(
+        ASSERT_TRUE(static_cast<const FDVar::DynamicVariable::ArrayType &>(
                       FDVar::DynamicVariable(FDVar::ValueType::Array))
                       .empty());
         ASSERT_FALSE(static_cast<const FDVar::DynamicVariable::ArrayType &>(
@@ -512,7 +521,7 @@ TEST(DynamicVariable_test, test_object_operators)
     }
 
     {
-        ASSERT_TRUE(static_cast<FDVar::DynamicVariable::ObjectType>(
+        ASSERT_TRUE(static_cast<const FDVar::DynamicVariable::ObjectType &>(
                       FDVar::DynamicVariable(FDVar::ValueType::Object))
                       .empty());
         ASSERT_FALSE(static_cast<const FDVar::DynamicVariable::ObjectType &>(

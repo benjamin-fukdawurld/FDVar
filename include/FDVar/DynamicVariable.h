@@ -3,24 +3,12 @@
 
 #include <math.h>
 
+#include <FDVar/DynamicVariable_ctors.h>
 #include <FDVar/DynamicVariable_fwd.h>
+#include <FDVar/DynamicVariable_stl.h>
 
 namespace FDVar
 {
-    template<typename T, typename U>
-    DynamicVariable::DynamicVariable(const T &value, U /*unused*/) :
-        DynamicVariable(is_DynamicVariable_constructible<T>::toVariable(value))
-    {
-    }
-
-    template<typename T>
-    std::enable_if_t<is_DynamicVariable_constructible<T>::value, DynamicVariable>
-      &DynamicVariable::operator=(const T &value)
-    {
-        m_value = is_AbstractValue_constructible<T>::toValue(value);
-        return *this;
-    }
-
     template<typename T>
     void DynamicVariable::convert(
       std::enable_if_t<!std::is_same_v<T, bool> && std::is_integral_v<T>, T> &result) const
@@ -838,7 +826,7 @@ std::enable_if_t<!std::is_integral_v<StreamType> &&
             break;
 
         case FDVar::ValueType::String:
-            stream << static_cast<FDVar::DynamicVariable::StringType>(value);
+            stream << static_cast<const FDVar::DynamicVariable::StringType &>(value);
             break;
 
         default:

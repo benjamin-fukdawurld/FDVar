@@ -2,12 +2,20 @@
 #define FDVAR_DYNAMICVARIABLE_FWD_H
 
 #include <algorithm>
+#include <deque>
+#include <forward_list>
+#include <initializer_list>
+#include <list>
+#include <map>
 #include <memory>
 #include <stdexcept>
+#include <unordered_map>
+#include <vector>
+
+#include <FDVar/AbstractValue.h>
 
 #include <FDVar/AbstractArrayValue.h>
 #include <FDVar/AbstractObjectValue.h>
-#include <FDVar/AbstractValue.h>
 #include <FDVar/ArrayValue.h>
 #include <FDVar/BoolValue.h>
 #include <FDVar/FloatValue.h>
@@ -18,8 +26,89 @@
 
 namespace FDVar
 {
-    template<typename T, bool B = is_AbstractValue_constructible_v<T>>
-    struct is_DynamicVariable_constructible;
+    class DynamicVariable;
+
+    template<typename T, typename U = void>
+    struct is_DynamicVariable_constructible
+    {
+        constexpr static bool value = is_AbstractValue_constructible_v<T>;
+    };
+
+    template<class T>
+    inline constexpr bool is_DynamicVariable_constructible_v =
+      is_DynamicVariable_constructible<T>::value;
+
+    template<typename T>
+    struct is_DynamicVariable_constructible<
+      T,
+      std::enable_if_t<
+        std::is_same_v<std::vector<DynamicVariable, std::allocator<DynamicVariable>>, T> ||
+          std::is_same_v<std::deque<DynamicVariable, std::allocator<DynamicVariable>>, T> ||
+          std::is_same_v<std::list<DynamicVariable, std::allocator<DynamicVariable>>, T> ||
+          std::is_same_v<std::forward_list<DynamicVariable, std::allocator<DynamicVariable>>, T>,
+        T>>
+    {
+        constexpr static bool value = true;
+    };
+
+    template<typename T>
+    struct is_DynamicVariable_constructible<
+      T,
+      std::enable_if_t<
+        std::is_same_v<std::initializer_list<std::pair<ObjectValue::StringType, DynamicVariable>>,
+                       T>,
+        T>>
+    {
+        constexpr static bool value = true;
+    };
+
+    template<typename T>
+    struct is_DynamicVariable_constructible<
+      T,
+      std::enable_if_t<
+        std::is_same_v<std::map<ObjectValue::StringType, DynamicVariable>, T> ||
+          std::is_same_v<std::unordered_map<ObjectValue::StringType, DynamicVariable>, T>,
+        T>>
+    {
+        constexpr static bool value = true;
+    };
+
+    template<typename T>
+    struct is_DynamicVariable_constructible<
+      std::initializer_list<T>,
+      std::enable_if_t<is_DynamicVariable_constructible_v<T>, std::initializer_list<T>>>
+    {
+        constexpr static bool value = true;
+    };
+
+    template<template<typename, typename> class ContainerType, typename T, typename AllocatorType>
+    struct is_DynamicVariable_constructible<
+      ContainerType<T, AllocatorType>,
+      std::enable_if_t<is_DynamicVariable_constructible_v<T>, T>>
+    {
+        constexpr static bool value = true;
+    };
+
+    template<typename T>
+    struct is_DynamicVariable_constructible<
+      std::initializer_list<std::pair<ObjectValue::StringType, T>>,
+      std::enable_if_t<is_DynamicVariable_constructible_v<T>,
+                       std::initializer_list<std::pair<ObjectValue::StringType, T>>>>
+    {
+        constexpr static bool value = true;
+    };
+    template<template<typename, typename, typename, typename> class ContainerType,
+             typename Key,
+             typename T,
+             typename Compare,
+             typename AllocatorType>
+    struct is_DynamicVariable_constructible<
+      ContainerType<Key, T, Compare, AllocatorType>,
+      std::enable_if_t<is_DynamicVariable_constructible_v<T>,
+                       ContainerType<Key, T, Compare, AllocatorType>>>
+    {
+        constexpr static bool value = true;
+    };
 
     class DynamicVariable
     {
@@ -38,80 +127,41 @@ namespace FDVar
 
       public:
         DynamicVariable();
-        DynamicVariable(const DynamicVariable &);
-        DynamicVariable(DynamicVariable &&) = default;
         DynamicVariable(ValueType type);
-        DynamicVariable(const AbstractValue::Ptr &value);
+
+        DynamicVariable(DynamicVariable &&) = default;
+        DynamicVariable(const DynamicVariable &);
+
         DynamicVariable(AbstractValue::Ptr &&value);
+        DynamicVariable(const AbstractValue::Ptr &value);
 
         template<typename T, typename U = std::enable_if_t<std::is_base_of_v<AbstractValue, T>, T>>
-        DynamicVariable(const T &value) : m_value(std::make_shared<T>(value))
-        {
-        }
+        DynamicVariable(const T &value);
 
         template<typename T, typename U = std::enable_if_t<std::is_base_of_v<AbstractValue, T>, T>>
-        DynamicVariable(T &&value) : m_value(std::make_shared<T>(std::forward<T>(value)))
-        {
-        }
+        DynamicVariable(T &&value);
 
+        DynamicVariable(StringViewType value);
 
-        DynamicVariable(StringViewType value) : m_value(std::make_shared<StringValue>(value)) {}
+        explicit DynamicVariable(ArrayType &&value);
 
-        template<typename T,
-                 typename U = std::enable_if_t<is_DynamicVariable_constructible<T>::value,
-                                               is_DynamicVariable_constructible<T>>>
-        explicit DynamicVariable(const T &value, U /*unused*/ = {});
+        explicit DynamicVariable(ObjectType &&value);
 
-        explicit DynamicVariable(const ArrayType &value) :
-            m_value(std::make_shared<ArrayValue>(value))
-        {
-        }
+        template<typename T>
+        explicit DynamicVariable(const T &value,
+                                 std::enable_if_t<is_DynamicVariable_constructible<T>::value,
+                                                  is_DynamicVariable_constructible<T>>
+                                 /*unused*/
+                                 = {});
 
-        explicit DynamicVariable(ArrayType &&value) :
-            m_value(std::make_shared<ArrayValue>(std::move(value)))
-        {
-        }
+        explicit DynamicVariable(std::initializer_list<AbstractValue::Ptr> l);
 
-        explicit DynamicVariable(const ObjectType &value) :
-            m_value(std::make_shared<ObjectValue>(value))
-        {
-        }
-
-        explicit DynamicVariable(ObjectType &&value) :
-            m_value(std::make_shared<ObjectValue>(std::move(value)))
-        {
-        }
-
-        explicit DynamicVariable(std::initializer_list<AbstractValue::Ptr> l) :
-            m_value(std::make_shared<ArrayValue>(l))
-        {
-        }
-
-        explicit DynamicVariable(std::initializer_list<DynamicVariable> l) : DynamicVariable()
-        {
-            ArrayType arr(l.size());
-            std::transform(l.begin(), l.end(), arr.begin(),
-                           [](const DynamicVariable &var) { return var.m_value; });
-            m_value = std::make_shared<ArrayValue>(std::move(arr));
-        }
+        explicit DynamicVariable(std::initializer_list<DynamicVariable> l);
 
         explicit DynamicVariable(
-          std::initializer_list<std::pair<StringViewType, DynamicVariable>> l) :
-            DynamicVariable()
-        {
-            ObjectValue obj;
-            for(const auto &[key, value]: l)
-            {
-                obj.set(key, value.m_value);
-            }
+          std::initializer_list<std::pair<StringViewType, DynamicVariable>> l);
 
-            m_value = std::make_shared<ObjectValue>(std::move(obj));
-        }
-
-        explicit DynamicVariable(const FunctionType &value) :
-            m_value(std::make_shared<FunctionValue>(wrapFunction(value)))
-        {
-        }
+        explicit DynamicVariable(const FunctionType &value);
 
         virtual ~DynamicVariable() = default;
 
@@ -122,28 +172,7 @@ namespace FDVar
 
         bool isType(ValueType type) const { return type == getValueType(); }
 
-        SizeType size() const;
-        bool isEmpty() const;
-        DynamicVariable operator[](SizeType pos);
-        DynamicVariable operator[](StringViewType member);
-
-        DynamicVariable keys();
-        DynamicVariable get(StringViewType member);
-        void set(StringViewType key, const DynamicVariable &value);
-        void unset(StringViewType key);
-
-        void push(const DynamicVariable &value);
-        DynamicVariable pop();
-
-        void insert(const DynamicVariable &value, SizeType pos);
-        DynamicVariable removeAt(SizeType pos);
-        void clear();
-
-        void append(const DynamicVariable &str) { append(static_cast<StringType>(str)); };
-        void append(StringViewType str);
-        DynamicVariable subString(SizeType from, SizeType count);
-
-        DynamicVariable &operator=(const DynamicVariable &) = default;
+        DynamicVariable &operator=(const DynamicVariable &);
         DynamicVariable &operator=(DynamicVariable &&) = default;
 
         DynamicVariable &operator=(StringViewType str);
@@ -152,7 +181,7 @@ namespace FDVar
         DynamicVariable &operator=(const ArrayType &arr);
 
         template<typename T>
-        std::enable_if_t<is_DynamicVariable_constructible<T>::value, DynamicVariable> &operator=(
+        std::enable_if_t<is_DynamicVariable_constructible<T>::value, DynamicVariable &> operator=(
           const T &value);
 
         DynamicVariable &operator=(const FunctionType &value)
@@ -162,11 +191,8 @@ namespace FDVar
         }
 
         explicit operator bool() const;
-        explicit operator StringType() const;
         explicit operator const StringType &() const;
-        explicit operator ArrayType() const;
         explicit operator const ArrayType &() const;
-        explicit operator ObjectType() const;
         explicit operator const ObjectType &() const;
 
         template<typename T>
@@ -539,6 +565,31 @@ namespace FDVar
             return *this;
         }
 
+        SizeType size() const;
+        bool isEmpty() const;
+        DynamicVariable operator[](SizeType pos);
+        DynamicVariable operator[](SizeType pos) const;
+        DynamicVariable operator[](StringViewType member);
+        DynamicVariable operator[](StringViewType member) const;
+        DynamicVariable operator[](const DynamicVariable &var);
+        DynamicVariable operator[](const DynamicVariable &var) const;
+
+        DynamicVariable keys() const;
+        DynamicVariable get(StringViewType member);
+        void set(StringViewType key, const DynamicVariable &value);
+        void unset(StringViewType key);
+
+        void push(const DynamicVariable &value);
+        DynamicVariable pop();
+
+        void insert(const DynamicVariable &value, SizeType pos);
+        DynamicVariable removeAt(SizeType pos);
+        void clear();
+
+        void append(const DynamicVariable &str) { append(static_cast<const StringType &>(str)); };
+        void append(StringViewType str);
+        DynamicVariable subString(SizeType from, SizeType count);
+
         template<typename StreamType,
                  typename U = std::enable_if_t<!std::is_integral_v<StreamType> &&
                                                  !std::is_same_v<DynamicVariable, StreamType>,
@@ -720,30 +771,18 @@ namespace FDVar
     };
 
     template<typename T>
-    struct is_DynamicVariable_constructible<T, false>
+    DynamicVariable toDynamicVariable(
+      const std::enable_if_t<is_AbstractValue_constructible_v<T>, T> &value)
     {
-        constexpr static bool value = false;
-    };
+        return DynamicVariable(FDVar::toAbstractValuePtr<T>(value));
+    }
 
     template<typename T>
-    struct is_DynamicVariable_constructible<T, true>
+    std::optional<std::enable_if_t<is_AbstractValue_constructible_v<T>, T>> fromDynamicVariable(
+      const DynamicVariable &value)
     {
-        constexpr static bool value = true;
-
-        static DynamicVariable toVariable(const T &value)
-        {
-            return DynamicVariable(is_AbstractValue_constructible<T>::toValue(value));
-        }
-
-        static std::optional<T> fromVariable(const AbstractValue::Ptr &value)
-        {
-            return is_AbstractValue_constructible<T>::fromValue(value);
-        }
-    };
-
-    template<class T>
-    inline constexpr bool is_DynamicVariable_constructible_v =
-      is_DynamicVariable_constructible<T>::value;
+        return FDVar::fromAbstractValuePtr<T>(value);
+    }
 } // namespace FDVar
 
 #endif // FDVAR_DYNAMICVARIABLE_FWD_H
